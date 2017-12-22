@@ -10,7 +10,6 @@ import org.jboss.weld.environment.servlet.Listener;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
-import java.net.URL;
 
 /**
  * Main.
@@ -31,18 +30,7 @@ public class Main {
     configureServlet(context, jerseyConfig);
 
     server.start();
-    System.out.println(String.format("Application available at %s://%s:%s%s",
-        Constants.NETWORK_PROTOCOL_HTTP,
-        Constants.NETWORK_HOST,
-        Constants.NETWORK_PORT,
-        Constants.CONTEXT_PATH));
-    System.out.println(String.format("Swagger available at %s://%s:%s%s%s/swagger.json",
-        Constants.NETWORK_PROTOCOL_HTTP,
-        Constants.NETWORK_HOST,
-        Constants.NETWORK_PORT,
-        Constants.CONTEXT_PATH,
-        Constants.PATH_BASE_REST));
-    System.out.println("Websocket connection available at - TODO");
+    printUrls();
     server.join();
   }
 
@@ -101,5 +89,20 @@ public class Main {
 
   private static String getResourcePath() {
     return String.format("/%s/*", Constants.PATH_BASE_REST);
+  }
+
+  private static void printUrls() {
+    System.out.println(String.format("Application available at %s://%s:%s%s",
+        Constants.NETWORK_PROTOCOL_HTTP,
+        Constants.NETWORK_HOST,
+        Constants.NETWORK_PORT,
+        Constants.CONTEXT_PATH));
+    System.out.println(String.format("Swagger available at %s://%s:%s%s%s/swagger.json",
+        Constants.NETWORK_PROTOCOL_HTTP,
+        Constants.NETWORK_HOST,
+        Constants.NETWORK_PORT,
+        Constants.CONTEXT_PATH,
+        Constants.PATH_BASE_REST));
+    System.out.println("Websocket connection available at - TODO");
   }
 }
