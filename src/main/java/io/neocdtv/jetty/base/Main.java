@@ -10,6 +10,7 @@ import org.jboss.weld.environment.servlet.Listener;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * Main.
@@ -19,8 +20,11 @@ import java.io.IOException;
  */
 public class Main {
 
+  private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+
   public static void main(String[] args) throws Exception {
 
+    configureJettyLogLevel();
     Server server = new Server(Constants.NETWORK_PORT);
     WebAppContext context = configureWebContext(server);
 
@@ -34,11 +38,15 @@ public class Main {
     server.join();
   }
 
+  private static void configureJettyLogLevel() {
+    System.setProperty("org.eclipse.jetty.LEVEL", "INFO");
+    System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLo");
+  }
+
   private static WebAppContext configureWebContext(Server server) throws IOException {
     WebAppContext context = new WebAppContext();
     context.setContextPath(Constants.CONTEXT_PATH);
 
-    context.setResourceBase(".");
     context.setResourceBase(new ClassPathResource("static").getURI().toString());
     context.setClassLoader(Thread.currentThread().getContextClassLoader());
 
@@ -92,17 +100,18 @@ public class Main {
   }
 
   private static void printUrls() {
-    System.out.println(String.format("Application available at %s://%s:%s%s",
+    final String applicationUrlInfo = String.format("Web application available at %s://%s:%s%s",
         Constants.NETWORK_PROTOCOL_HTTP,
         Constants.NETWORK_HOST,
         Constants.NETWORK_PORT,
-        Constants.CONTEXT_PATH));
-    System.out.println(String.format("Swagger available at %s://%s:%s%s%s/swagger.json",
+        Constants.CONTEXT_PATH);
+    final String swaggerUrlInfo = String.format("Swagger available at %s://%s:%s%s%s/swagger.json",
         Constants.NETWORK_PROTOCOL_HTTP,
         Constants.NETWORK_HOST,
         Constants.NETWORK_PORT,
         Constants.CONTEXT_PATH,
-        Constants.PATH_BASE_REST));
-    System.out.println("Websocket connection available at - TODO");
+        Constants.PATH_BASE_REST);
+    final String websocketUrlInfo = "WebSocket connection available at - TODO";
+    LOGGER.info("\n" + applicationUrlInfo + "\n" + swaggerUrlInfo + "\n" + websocketUrlInfo);
   }
 }
