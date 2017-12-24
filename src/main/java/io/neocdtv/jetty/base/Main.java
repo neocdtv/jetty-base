@@ -15,6 +15,7 @@ import javax.servlet.ServletException;
 import javax.websocket.DeploymentException;
 import javax.websocket.server.ServerContainer;
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.logging.Logger;
 
 /**
@@ -26,11 +27,13 @@ import java.util.logging.Logger;
 public class Main {
 
   private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+  private static int NETWORK_PORT;
 
   public static void main(String[] args) throws Exception {
 
+    discoverFreeNetworkPort();
     configureJettyLogLevel();
-    Server server = new Server(Constants.NETWORK_PORT);
+    Server server = new Server(NETWORK_PORT);
     WebAppContext context = configureWebContext(server);
 
     configureCdi(context);
@@ -42,6 +45,11 @@ public class Main {
     server.start();
     printUrls();
     server.join();
+  }
+
+  private static void discoverFreeNetworkPort() throws IOException {
+    final ServerSocket socket = new ServerSocket(0);
+    NETWORK_PORT = socket.getLocalPort();
   }
 
   private static void configureJettyLogLevel() {
@@ -103,7 +111,7 @@ public class Main {
   }
 
   private static String getHost() {
-    return String.format("%s:%s", Constants.NETWORK_HOST, Constants.NETWORK_PORT);
+    return String.format("%s:%s", Constants.NETWORK_HOST, NETWORK_PORT);
   }
 
   private static String getResourcePath() {
@@ -111,20 +119,17 @@ public class Main {
   }
 
   private static void printUrls() {
-    final String applicationUrlInfo = String.format("Web application available at %s://%s:%s%s",
+    final String applicationUrlInfo = String.format("Web application available at %s://%s%s",
         Constants.NETWORK_PROTOCOL_HTTP,
-        Constants.NETWORK_HOST,
-        Constants.NETWORK_PORT,
+        getHost(),
         Constants.CONTEXT_PATH);
-    final String swaggerUrlInfo = String.format("Swagger available at %s://%s:%s%s%s/swagger.json",
+    final String swaggerUrlInfo = String.format("Swagger available at %s://%s%s%s/swagger.json",
         Constants.NETWORK_PROTOCOL_HTTP,
-        Constants.NETWORK_HOST,
-        Constants.NETWORK_PORT,
+        getHost(),
         Constants.CONTEXT_PATH,
         Constants.PATH_BASE_REST);
-    final String websocketUrlInfo = String.format("WebSocket connection available at - ws://%s:%s%s%s",
-        Constants.NETWORK_HOST,
-        Constants.NETWORK_PORT,
+    final String websocketUrlInfo = String.format("WebSocket connection available at - ws://%s%s%s",
+        getHost(),
         Constants.CONTEXT_PATH,
         Constants.PATH_BASE_EVENTS);
     LOGGER.info("\n" + applicationUrlInfo + "\n" + swaggerUrlInfo + "\n" + websocketUrlInfo);
