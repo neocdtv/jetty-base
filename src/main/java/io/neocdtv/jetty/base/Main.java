@@ -1,14 +1,19 @@
 package io.neocdtv.jetty.base;
 
+import io.neocdtv.jetty.base.boundary.ExampleWebSocket;
 import io.swagger.jaxrs.config.BeanConfig;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.jboss.weld.environment.servlet.Listener;
 import org.springframework.core.io.ClassPathResource;
 
+import javax.servlet.ServletException;
+import javax.websocket.DeploymentException;
+import javax.websocket.server.ServerContainer;
 import java.io.IOException;
 import java.util.logging.Logger;
 
@@ -32,6 +37,7 @@ public class Main {
     final ResourceConfig jerseyConfig = configureJersey();
     configureSwagger(jerseyConfig);
     configureServlet(context, jerseyConfig);
+    configureWebSocket(context);
 
     server.start();
     printUrls();
@@ -39,15 +45,15 @@ public class Main {
   }
 
   private static void configureJettyLogLevel() {
-    System.setProperty("org.eclipse.jetty.LEVEL", "INFO");
-    System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLo");
+    System.setProperty(Constants.JETTY_LOG_LEVEL, "INFO");
+    System.setProperty(Constants.JETTY_LOGGER, Constants.JETTY_LOGGER_CLASS);
   }
 
   private static WebAppContext configureWebContext(Server server) throws IOException {
     WebAppContext context = new WebAppContext();
     context.setContextPath(Constants.CONTEXT_PATH);
 
-    context.setResourceBase(new ClassPathResource("static").getURI().toString());
+    context.setResourceBase(new ClassPathResource(Constants.PATH_STATIC).getURI().toString());
     context.setClassLoader(Thread.currentThread().getContextClassLoader());
 
     server.setHandler(context);
@@ -87,6 +93,11 @@ public class Main {
     //context.addEventListener(new BeanManagerResourceBindingListener());
   }
 
+  private static void configureWebSocket(WebAppContext context) throws ServletException, DeploymentException {
+    ServerContainer webSockerContainer = WebSocketServerContainerInitializer.configureContext(context);
+    webSockerContainer.addEndpoint(ExampleWebSocket.class);
+  }
+
   private static String getBasePath() {
     return String.format("/%s", Constants.PATH_BASE_REST);
   }
@@ -111,7 +122,11 @@ public class Main {
         Constants.NETWORK_PORT,
         Constants.CONTEXT_PATH,
         Constants.PATH_BASE_REST);
-    final String websocketUrlInfo = "WebSocket connection available at - TODO";
+    final String websocketUrlInfo = String.format("WebSocket connection available at - ws://%s:%s%s%s",
+        Constants.NETWORK_HOST,
+        Constants.NETWORK_PORT,
+        Constants.CONTEXT_PATH,
+        Constants.PATH_BASE_EVENTS);
     LOGGER.info("\n" + applicationUrlInfo + "\n" + swaggerUrlInfo + "\n" + websocketUrlInfo);
   }
 }

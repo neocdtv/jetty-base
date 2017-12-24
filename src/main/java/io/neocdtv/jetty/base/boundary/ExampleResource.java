@@ -22,11 +22,11 @@ import javax.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON)
 public class ExampleResource {
 
-	@Inject
-	private ExampleControl exampleControl;
+  @Inject
+  private ExampleControl exampleControl;
 
-	@GET
-	public Response exampleRestMethod() {
-		return Response.ok(exampleControl.businessMethod()).build();
-	}
+  @GET
+  public Response exampleRestMethod() {
+    return Response.ok(exampleControl.businessMethod()).build();
+  }
 }
