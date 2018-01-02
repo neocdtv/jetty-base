@@ -102,8 +102,8 @@ public class Main {
   }
 
   private static void configureWebSocket(WebAppContext context) throws ServletException, DeploymentException {
-    ServerContainer webSockerContainer = WebSocketServerContainerInitializer.configureContext(context);
-    webSockerContainer.addEndpoint(ExampleWebSocket.class);
+    ServerContainer webSocketContainer = WebSocketServerContainerInitializer.configureContext(context);
+    webSocketContainer.addEndpoint(ExampleWebSocket.class);
   }
 
   private static String getBasePath() {
