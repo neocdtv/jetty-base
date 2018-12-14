@@ -6,7 +6,6 @@ import io.neocdtv.jetty.base.Constants;
 import io.neocdtv.jetty.base.control.JacksonObjectMapper;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import javax.websocket.CloseReason;
 import javax.websocket.EncodeException;
 import javax.websocket.EndpointConfig;
